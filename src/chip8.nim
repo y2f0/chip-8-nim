@@ -1,4 +1,4 @@
-import graphics, sdl, tables, colors
+import graphics, sdl, tables, colors, parseopt2
 
 when defined(macosx):
   const
@@ -13,8 +13,18 @@ proc main =
     maxfps = 1000/200
     nextFrame = sdl.GetTicks()
     emu = createEmu()
+    filename = ""
 
-  emu.loadROM("./roms/PONG2")
+  for kind, key, val in getopt():
+    case kind:
+      of cmdArgument:
+        filename = key
+      else: discard
+  if filename.len > 0:
+    emu.loadROM(filename)
+  else:
+    echo("Usage: chip8 [rom]")
+    return
   discard sdl.FillRect(emu.surface.s, nil, 0)
 
   while true:
@@ -28,7 +38,5 @@ proc main =
       case event.kind:
       of SDL.QUITEV: system.quit()
       else: break 
-
-
     
 main()
